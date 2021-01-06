@@ -4,6 +4,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
+from utils import getAllInfo
+
 app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
@@ -15,4 +17,23 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, ip: Optional[str] = None):
-    return templates.TemplateResponse("home.html", {"request": request, "ip": ip})
+    # ipDetails, asnPrefixes = await getAllInfo(ip)
+
+    import json
+
+    ipDetails = None
+    asnPrefixes = None
+
+    if ip is not None:
+        with open("ipDetails.json") as f:
+            ipDetails = json.load(f)
+        with open("asnPrefixes.json") as f:
+            asnPrefixes = json.load(f)
+
+    infoDict = {
+        "request": request,
+        "ip": ip,
+        "ipDetails": ipDetails,
+        "asnPrefixes": asnPrefixes,
+    }
+    return templates.TemplateResponse("home.html", infoDict)
