@@ -25,9 +25,13 @@ async def home(request: Request, ip: Optional[str] = None):
     asnPrefixes = None
 
     if ip is not None:
+        # with open("ipDetails.json", "w") as f:
         with open("ipDetails.json") as f:
+            # json.dump(ipDetails, f, indent=2)
             ipDetails = json.load(f)
+        # with open("asnPrefixes.json", "w") as f:
         with open("asnPrefixes.json") as f:
+            # json.dump(asnPrefixes, f, indent=2)
             asnPrefixes = json.load(f)
 
     infoDict = {

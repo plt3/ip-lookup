@@ -51,6 +51,35 @@
               </tbody>
             {% endif %}
           </table>
+
+          {% if ip %}
+            {% for asn in asnPrefixes %}
+              <h3>Prefixes for {{ asn }}:</h3>
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Prefix</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Country</th>
+                    <th scope="col">Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for prefix in asnPrefixes[asn] %}
+                    <tr>
+                      <td>{{ prefix.prefix }}</td>
+                      <td>{{ prefix.name }}</td>
+                      <td>{{ prefix.description }}</td>
+                      <td>{{ prefix.country_code }}</td>
+                      <td>{{ prefix.type }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% endfor %}
+          {% endif %}
+
         </div>
       </div>
     </div>

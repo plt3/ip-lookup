@@ -54,7 +54,24 @@ async def getAsnPrefixes(asnList, session):
     ]
     asnPrefixes = await asyncio.gather(*asnTasks)
 
-    return {asn: prefixData["data"] for asn, prefixData in zip(asnList, asnPrefixes)}
+    asnInfoDict = {}
+
+    for asn, prefixData in zip(asnList, asnPrefixes):
+        asnData = []
+
+        for prefixType in prefixData["data"]:
+            if prefixType == "ipv4_prefixes":
+                shortPrefixType = "IPv4"
+            else:
+                shortPrefixType = "IPv6"
+            for prefix in prefixData["data"][prefixType]:
+                prefix["type"] = shortPrefixType
+                asnData.append(prefix)
+
+        asnInfoDict[asn] = asnData
+
+    # return {asn: prefixData["data"] for asn, prefixData in zip(asnList, asnPrefixes)}
+    return asnInfoDict
 
 
 async def getJson(url, session):
