@@ -1,26 +1,13 @@
 from typing import Optional
 
-from fastapi import FastAPI, Request
+from fastapi import Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from errors import ASNPrefixError, IPDetailsError
-from utils import getAllInfo
-from validate import validateIp
-
-app = FastAPI()
-
-# register javascript file in static directory
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-# register Jinja2 templates in templates directory
-templates = Jinja2Templates(directory="templates")
-
-# TODO: add docstrings/comments, would be cool if IP address field
-# autopopulated to user's IP address,
-# do some form of testing
+from webApp import app, templates
+from webApp.errors import ASNPrefixError, IPDetailsError
+from webApp.utils import getAllInfo
+from webApp.validate import validateIp
 
 
 @app.get("/", response_class=HTMLResponse)

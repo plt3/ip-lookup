@@ -2,7 +2,7 @@ import asyncio
 
 import aiohttp
 
-from errors import ASNPrefixError, IPDetailsError
+from webApp.errors import ASNPrefixError, IPDetailsError
 
 
 async def getAllInfo(ipAddress, isValid):
