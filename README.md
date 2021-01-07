@@ -1,6 +1,12 @@
 # ip-lookup
 > FastAPI web app to view information about IP addresses
 
+## Some Notes:
+- Can skip installation by visiting deployed app at https://ip-addr-lookup.herokuapp.com/
+  - Should be mobile-friendly!
+  - May take a few seconds to load at first if Heroku app has gone idle
+- Sometimes, both in local and deployed app, the API being used (see https://bgpview.docs.apiary.io/#reference/0/asn-prefixes) takes several seconds to respond, causing the page to load slowly. This is normal and should not happen every time.
+
 ## Installation:
 NOTE: tested for Mac, but installation on Linux or Windows should be similar.   
 Requirements: Python 3.6+, Pip
