@@ -2,22 +2,26 @@ import asyncio
 
 import aiohttp
 
+from errors import ASNPrefixError, IPDetailsError
 
-async def getAllInfo(ipAddress):
+
+async def getAllInfo(ipAddress, isValid):
     """TODO: Docstring for getAllInfo.
 
     :ipAddress: TODO
+    :isValid: TODO
     :returns: TODO
 
     """
-    if ipAddress is None:
+    if not isValid:
         return None, None
-
-    # THIS NEEDS A LOT OF ERROR HANDLING!!!!! (IF USER ENTERS RANDOM STRING, NOT IP)
 
     async with aiohttp.ClientSession() as mainSession:
         ipDetails, asns = await getIPDetails(ipAddress, mainSession)
         asnPrefixes = await getAsnPrefixes(asns, mainSession)
+
+    changeNone(ipDetails)
+    changeNone(asnPrefixes)
 
     return ipDetails, asnPrefixes
 
@@ -33,6 +37,9 @@ async def getIPDetails(ipAddress, session):
     ipDetailEndpoint = f"https://api.bgpview.io/ip/{ipAddress}"
 
     ipDetailJson = await getJson(ipDetailEndpoint, session)
+
+    if ipDetailJson["status"] == "error":
+        raise IPDetailsError('"View IP Address Details" API endpoint raised an error.')
 
     prefixList = ipDetailJson["data"]["prefixes"]
     asnList = [prefix["asn"]["asn"] for prefix in prefixList]
@@ -57,6 +64,9 @@ async def getAsnPrefixes(asnList, session):
     asnInfoDict = {}
 
     for asn, prefixData in zip(asnList, asnPrefixes):
+        if prefixData["status"] == "error":
+            raise ASNPrefixError('"View ASN Prefixes" API endpoint raised an error.')
+
         asnData = []
 
         for prefixType in prefixData["data"]:
@@ -70,7 +80,6 @@ async def getAsnPrefixes(asnList, session):
 
         asnInfoDict[asn] = asnData
 
-    # return {asn: prefixData["data"] for asn, prefixData in zip(asnList, asnPrefixes)}
     return asnInfoDict
 
 
@@ -83,15 +92,27 @@ async def getJson(url, session):
 
     """
 
-    # should probably have more error handling here
-
     async with session.get(url) as response:
-        print(response.status)
         jsonResp = await response.json()
 
     return jsonResp
 
 
-if __name__ == "__main__":
-    asyncio.run(getAllInfo("73.143.190.5"))
-    # asyncio.run(getAllInfo("2620:119:35::35"))
+def changeNone(listOrDict):
+    """TODO: Docstring for removeNone.
+
+    :listOrDict: TODO
+    :returns: TODO
+
+    """
+    noneReplacement = "not specified"
+
+    if isinstance(listOrDict, list):
+        for element in listOrDict:
+            changeNone(element)
+    elif isinstance(listOrDict, dict):
+        for key in listOrDict:
+            if listOrDict[key] is None:
+                listOrDict[key] = noneReplacement
+            else:
+                changeNone(listOrDict[key])

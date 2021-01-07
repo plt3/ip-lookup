@@ -5,7 +5,9 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+from errors import ASNPrefixError, IPDetailsError
 from utils import getAllInfo
+from validate import validateIp
 
 app = FastAPI()
 
@@ -13,33 +15,59 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
-# TODO: get functionality, add docstrings/comments, would be cool if IP address field
-# autopopulated to user's IP address
+# TODO: add docstrings/comments, would be cool if IP address field
+# autopopulated to user's IP address,
+# do some form of testing
 
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, ip: Optional[str] = None):
-    # ipDetails, asnPrefixes = await getAllInfo(ip)
+    cleanIp, isIpValid = validateIp(ip)
 
-    import json
-
+    error = None
     ipDetails = None
     asnPrefixes = None
 
-    if ip is not None:
-        # with open("ipDetails.json", "w") as f:
-        with open("ipDetails.json") as f:
-            # json.dump(ipDetails, f, indent=2)
-            ipDetails = json.load(f)
-        # with open("asnPrefixes.json", "w") as f:
-        with open("asnPrefixes.json") as f:
-            # json.dump(asnPrefixes, f, indent=2)
-            asnPrefixes = json.load(f)
+    try:
+        ipDetails, asnPrefixes = await getAllInfo(cleanIp, isIpValid)
+    except IPDetailsError as ipError:
+        error = str(ipError)
+    except ASNPrefixError as asnError:
+        error = str(asnError)
+    except Exception:
+        error = "There was an error querying the API."
 
     infoDict = {
         "request": request,
-        "ip": ip,
+        "error": error,
+        "ip": cleanIp,
+        "isIpValid": isIpValid,
         "ipDetails": ipDetails,
         "asnPrefixes": asnPrefixes,
     }
+
+    # import json
+
+    # ipDetails = None
+    # asnPrefixes = None
+
+    # if isIpValid:
+    #     # with open("ipDetails.json", "w") as f:
+    #     with open("ipDetails.json") as f:
+    #         # json.dump(ipDetails, f, indent=2)
+    #         ipDetails = json.load(f)
+    #     # with open("asnPrefixes.json", "w") as f:
+    #     with open("asnPrefixes.json") as f:
+    #         # json.dump(asnPrefixes, f, indent=2)
+    #         asnPrefixes = json.load(f)
+
+    # infoDict = {
+    #     "request": request,
+    #     "ip": cleanIp,
+    #     "error": None,
+    #     "isIpValid": isIpValid,
+    #     "ipDetails": ipDetails,
+    #     "asnPrefixes": asnPrefixes,
+    # }
+
     return templates.TemplateResponse("home.html", infoDict)
