@@ -25,6 +25,15 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, ip: Optional[str] = None):
+    """Main view function housing all functionality of web app
+
+    :request (fastapi.Request): Required to return any response template
+    :ip (str): IPv4 or IPv6 address as a string to get information about. If not
+    included, will show basica IP address search form
+    :returns: fastapi.templating.Jinja2Templates.TemplateResponse for HTML page of
+    web app
+
+    """
     cleanIp, isIpValid = validateIp(ip)
 
     error = None
@@ -33,7 +42,6 @@ async def home(request: Request, ip: Optional[str] = None):
 
     try:
         ipDetails, asnPrefixes = await getAllInfo(cleanIp, isIpValid)
-        print("got em")
     except IPDetailsError as ipError:
         error = str(ipError)
     except ASNPrefixError as asnError:
