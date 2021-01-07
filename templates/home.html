@@ -10,8 +10,8 @@
     <title>IP Lookup</title>
   </head>
   <body>
-    <div class="container">
-      <form class="border p-3 mt-3 mb-3 rounded" action="" method="GET" accept-charset="utf-8">
+    <div class="container mb-3">
+      <form id="pageTop" class="border p-3 mt-3 mb-3 rounded" action="" method="GET" accept-charset="utf-8">
         <legend>IP Address Lookup</legend>
         <hr>
         <div class="mb-3">
@@ -96,6 +96,9 @@
             </tbody>
           </table>
         {% endfor %}
+        <div class="text-end">
+          <a class="btn btn-primary" href="#">Back to top</a>
+        </div>
       {% endif %}
     </div>
 
