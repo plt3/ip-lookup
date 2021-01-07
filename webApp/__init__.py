@@ -12,7 +12,3 @@ templates = Jinja2Templates(directory="webApp/templates")
 
 # must import app routes after creating FastAPI instance to avoid circular import
 from webApp import routes
-
-# TODO: add docstrings/comments, would be cool if IP address field
-# autopopulated to user's IP address,
-# do some form of testing

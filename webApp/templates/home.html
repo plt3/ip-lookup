@@ -11,11 +11,14 @@
   </head>
   <body>
     <div class="container mb-3">
+      <!-- form makes a GET request to this page so that users can also search by directly typing in the address bar -->
       <form id="pageTop" class="border p-3 mt-3 mb-3 rounded" action="" method="GET" accept-charset="utf-8">
         <legend>IP Address Lookup</legend>
         <hr>
         <div class="mb-3">
+          {# only populate form input with IP address if it was deemed valid #}
           {% if not isIpValid %}
+            {# only add is-invalid Bootstrap class if ip is not None #}
             {% if ip is none %}
               <input class="form-control" type="text" name="ip" id="ip" placeholder="Enter any IPv4 or IPv6 address:" required />
             {% else %}
@@ -25,6 +28,7 @@
             <input class="form-control" type="text" name="ip" id="ip" value="{{ ip }}" placeholder="Enter any IPv4 or IPv6 address:" required />
           {% endif %}
 
+          {# only show error message if user tried to input invalid IP address #}
           {% if not isIpValid and ip is not none %}
             <div class="invalid-feedback">
               "{{ ip }}" is not a valid IP address. Please try again.
@@ -34,6 +38,12 @@
         <button type="submit" class="btn btn-primary">Submit</button>
       </form>
 
+      {# account for 4 different possibilities here:
+      1. no error detected, but API returned no ASN information
+      2. no error detected and API returned ASN information (success)
+      3. API returned some sort of error
+      4. user has not entered an IP address to search (querystring is empty)
+      #}
       {% if isIpValid and error is none %}
         {% if ipDetails | length == 0 %}
           <p class="fs-3 text-center mb-3">No information found for {{ ip }}.</p>
@@ -46,6 +56,7 @@
         <p class="fs-3 text-center mb-3">Enter an IP address above to view information about it.</p>
       {% endif %}
 
+      <!-- first table which contains direct information about the given IP address -->
       <div class="table-responsive">
         <table class="table table-striped table-hover">
           <thead>
@@ -57,6 +68,7 @@
               <th scope="col">ASN</th>
             </tr>
           </thead>
+          {# only populate table body if IP address is valid and there were no errors #}
           {% if isIpValid and error is none %}
             <tbody>
               {% for prefix in ipDetails %}
@@ -73,12 +85,15 @@
         </table>
       </div>
 
+      {# only create individual ASN tables if IP address is valid and no errors #}
       {% if isIpValid and error is none %}
         {% for asn in asnPrefixes %}
           <p class="fs-3 text-center mt-4">
             IP Prefixes for AS{{ asn }} ({{ asnPrefixes[asn] | length }} found):
+            <!-- collapse all tables by default to avoid overwhelming the user when a search returns a lot of information -->
             <a class="text-decoration-none fs-5" data-bs-toggle="collapse" href="#AS{{ asn }}" role="button" aria-expanded="false" aria-controls="AS{{ asn }}" onclick="changeText()">Click to show</a>
           </p>
+          <!-- create a table for the IP prefixes associated with each ASN associated with the given IP address -->
           <div class="table-responsive">
             <table id="AS{{ asn }}" class="collapse table table-striped table-hover">
               <thead>
@@ -91,6 +106,7 @@
                 </tr>
               </thead>
               <tbody>
+                {# add a row for each prefix associated to each ASN that came up in the search #}
                 {% for prefix in asnPrefixes[asn] %}
                   <tr>
                     <td>{{ prefix.prefix }}</td>
@@ -104,13 +120,16 @@
             </table>
           </div>
         {% endfor %}
+        {# only show back to top button if user searched for a valid IP address #}
         <div class="text-end">
           <a class="btn btn-primary" href="#">Back to top</a>
         </div>
       {% endif %}
     </div>
 
+    <!-- link to short script to change "Click to show" button text -->
     <script src="{{ url_for('static', path='/homeScripts.js') }}" charset="utf-8"></script>
+
     <!-- Bootstrap javascript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
   </body>
