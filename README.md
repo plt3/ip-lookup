@@ -9,7 +9,7 @@
 
 ## Installation:
 NOTE: tested for Mac, but installation on Linux or Windows should be similar.   
-Requirements: Python 3.6+, Pip
+Requirements: Python 3.6+, pip
 - Clone repo with `git clone https://github.com/plt3/ip-lookup`
 - Enter project directory with `cd ip-lookup`
 - Recommended: create virtual environment: `python3 -m venv venv` and activate it: `source venv/bin/activate`
@@ -19,6 +19,9 @@ Requirements: Python 3.6+, Pip
 - In project home directory, run server with `uvicorn runApp:app`
 - Navigate to http://localhost:8000 or http://127.0.0.1:8000 in browser
 - When finished, kill the server with Ctrl + c
+
+## Testing:
+- Run small testing suite with `pytest` in project home directory (do not run server separately during testing)
 
 ## Screenshots:
 ### Main page once server is running:
